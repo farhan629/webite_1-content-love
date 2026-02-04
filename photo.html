@@ -197,7 +197,7 @@
         window.onload = () => {
             const configData = window.CONFIG || {};
             const localData = JSON.parse(localStorage.getItem('romanticSiteData')) || {};
-            const data = { ...localData, ...configData };
+            const data = { ...configData, ...localData };
             const notesContainer = document.getElementById('notesContainer');
 
             // Handle structured notes from CONFIG or simple array from localStorage

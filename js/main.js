@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const localData = JSON.parse(localStorage.getItem('romanticSiteData')) || {};
     const configData = window.CONFIG || {};
     
-    // Merge logic: Config takes absolute precedence for "Real Hosting"
-    const data = { ...localData, ...configData };
+    // Merge logic: localData wins for live preview/editing, configData is for prod fallback
+    const data = { ...configData, ...localData };
 
     if (data) {
         const yesBtn = document.getElementById('yesBtn');
