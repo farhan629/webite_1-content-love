@@ -5,11 +5,29 @@ let uploadedPhotos = [];
 let giftNotes = [];
 let backgroundMusic = "";
 
+function checkSyncStatus() {
+    const light = document.getElementById('syncLight');
+    const status = document.getElementById('syncStatus');
+    
+    fetch('http://localhost:3001/status')
+        .then(() => {
+            light.style.background = "#4CAF50";
+            status.innerText = "GitHub Sync Connected";
+            status.style.color = "#4CAF50";
+        })
+        .catch(() => {
+            light.style.background = "#ff4d4d";
+            status.innerText = "Sync Offline (Run 'node server.js')";
+            status.style.color = "#ff4d4d";
+        });
+}
+
 function checkLogin() {
     const pwd = document.getElementById('adminPassword').value;
     if (pwd === DEFAULT_PASSWORD) {
         document.getElementById('loginOverlay').style.display = 'none';
         loadSettings();
+        checkSyncStatus();
     } else {
         alert("Incorrect password! Hint: The password is 'love'");
     }
@@ -294,7 +312,7 @@ async function generateGitHubConfig() {
     document.getElementById('configOutput').value = configCode;
 
     try {
-        const response = await fetch('/sync', {
+        const response = await fetch('http://localhost:3001/sync', {
             method: 'POST',
             body: JSON.stringify(data)
         });
