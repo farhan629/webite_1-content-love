@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Memory Lane</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Outfit:wght@400;800&display=swap"
+        rel="stylesheet">
+    <script src="js/config.js"></script>
+    <style>
+        body {
+            background: #0b0101;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* Ensure scrolling is enabled */
+            margin: 0;
+            padding: 80px 20px;
+        }
+
+        .bg-blur {
+            position: fixed;
+            top: -50px;
+            left: -50px;
+            right: -50px;
+            bottom: -50px;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(50px, 8vw, 100px);
+            color: white;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .intro-p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 20px;
+            margin-bottom: 60px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Gift Notes Section */
+        .gift-notes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin-bottom: 100px;
+        }
+
+        .gift-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.05) translateY(-10px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 50px rgba(255, 117, 140, 0.3);
+        }
+
+        .gift-box h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .gift-box .sparkle-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Splash Gallery Container */
+        .splash-gallery {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        .splashed-photo {
+            position: absolute;
+            width: 300px;
+            padding: 15px 15px 60px 15px;
+            background: white;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: auto;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+        }
+
+        .splashed-photo img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        .splashed-photo .p-seal {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .splashed-photo {
+                width: 200px;
+                padding: 10px 10px 40px 10px;
+            }
+
+            .splashed-photo img {
+                height: 180px;
+            }
+
+            .splashed-photo .p-seal {
+                font-size: 18px;
+                bottom: 12px;
+            }
+
+            .gift-box {
+                max-width: 140px;
+                padding: 20px 10px;
+            }
+
+            .gift-box h3 {
+                font-size: 18px;
+            }
+
+            .gift-box .sparkle-icon {
+                font-size: 24px;
+            }
+        }
+
+        .final-cta {
+            margin: 60px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blur"></div>
+    <div class="particles" id="particles"></div>
+
+    <h1 id="galleryTitle">Our Secret Lane</h1>
+    <p class="intro-p">Click on a gift note to see our memories "splash" out!</p>
+
+    <div class="gift-notes-container" id="notesContainer">
+        <!-- Gift Notes injected here -->
+    </div>
+
+    <div class="splash-gallery" id="splashArea"></div>
+
+    <div class="final-cta">
+        <button class="save-btn" style="padding: 20px 60px; font-size: 24px;"
+            onclick="window.location.href='index.html'">Start Our Journey Again ❤️</button>
+    </div>
+
+    <script>
+        let isSplashing = false;
+
+        window.onload = () => {
+            const configData = window.CONFIG || {};
+            const localData = JSON.parse(localStorage.getItem('romanticSiteData')) || {};
+            const data = { ...localData, ...configData };
+            const notesContainer = document.getElementById('notesContainer');
+
+            // Handle structured notes from CONFIG or simple array from localStorage
+            const allNotes = data.notes || [];
+
+            if (allNotes.length > 0) {
+                allNotes.forEach((noteObj, index) => {
+                    // Normalize: could be string (local) or object (config)
+                    const noteText = typeof noteObj === 'string' ? noteObj : noteObj.text;
+                    const notePhotos = typeof noteObj === 'string' ? data.photos : (noteObj.photos || data.photos);
+
+                    const box = document.createElement('div');
+                    box.className = 'gift-box';
+                    box.innerHTML = `
+                        <span class="sparkle-icon">🎁</span>
+                        <h3>${noteText}</h3>
+                        <p style="font-size: 14px; opacity:0.7;">Click for a Surprise</p>
+                    `;
+                    box.onclick = (e) => {
+                        e.stopPropagation();
+                        // Trigger splash specifically with this note's photos or all photos
+                        triggerSplash(box, notePhotos);
+                    };
+                    notesContainer.appendChild(box);
+                });
+            } else {
+                notesContainer.innerHTML = `
+                    <div style="color:white; text-align:center; padding: 40px; background:rgba(255,117,140,0.1); border-radius:30px; border:1px dashed rgba(255,255,255,0.3); max-width:600px;">
+                        <h2 style="font-family:'Dancing Script'; font-size:32px; margin-bottom:15px;">Your Memories are Waiting! ❤️</h2>
+                        <p style="opacity:0.8; font-size:18px; line-height:1.6;">
+                            Since you are on a new URL (hosting), you need to 
+                            <a href="admin.html" style="color:#ff758c; font-weight:bold; text-decoration:none;">Go to the Admin Panel</a> 
+                            and upload your photos and music again to see the magic!
+                        </p>
+                    </div>
+                `;
+            }
+
+            createInitialSparkles();
+        };
+
+        function triggerSplash(originElement, customPhotos) {
+            const data = JSON.parse(localStorage.getItem('romanticSiteData')) || window.CONFIG || {};
+            const splashArea = document.getElementById('splashArea');
+            const photos = customPhotos || data.photos || [];
+
+            if (photos.length === 0) {
+                alert("Please go to Admin and upload some photos first! ❤️");
+                return;
+            }
+
+            // Reset and show splash area
+            splashArea.innerHTML = '';
+            splashArea.style.pointerEvents = 'auto';
+            splashArea.style.background = 'rgba(0,0,0,0.8)';
+            splashArea.style.transition = 'background 0.5s';
+
+            const originRect = originElement.getBoundingClientRect();
+            const startX = originRect.left + originRect.width / 2 - 150;
+            const startY = originRect.top + originRect.height / 2 - 150;
+
+            photos.forEach((src, i) => {
+                const photo = document.createElement('div');
+                photo.className = 'splashed-photo';
+                photo.innerHTML = `
+                    <img src="${src}" alt="Memory">
+                    <div class="p-seal">Our Moment ❤️</div>
+                `;
+
+                photo.style.left = startX + 'px';
+                photo.style.top = startY + 'px';
+                photo.style.transform = 'scale(0.1) rotate(0deg)';
+                photo.style.opacity = '1';
+                photo.style.zIndex = 5000 + i;
+
+                splashArea.appendChild(photo);
+
+                setTimeout(() => {
+                    const angle = (Math.PI * 2 / photos.length) * i + (Math.random() * 0.5);
+                    const radius = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+                    const destX = (window.innerWidth / 2 - 150) + Math.cos(angle) * radius;
+                    const destY = (window.innerHeight / 2 - 180) + Math.sin(angle) * radius;
+                    const rotation = (Math.random() - 0.5) * 30;
+
+                    photo.style.left = Math.min(Math.max(20, destX), window.innerWidth - 320) + 'px';
+                    photo.style.top = Math.min(Math.max(20, destY), window.innerHeight - 380) + 'px';
+                    photo.style.transform = `scale(1) rotate(${rotation}deg)`;
+                }, 50 + (i * 150));
+
+                photo.onclick = (e) => {
+                    e.stopPropagation();
+                    const isZoomed = photo.style.transform.includes('scale(1.4)');
+                    if (isZoomed) {
+                        photo.style.transform = photo.dataset.originalTransform;
+                        photo.style.zIndex = 5000 + i;
+                    } else {
+                        photo.dataset.originalTransform = photo.style.transform;
+                        photo.style.transform = 'scale(1.4) rotate(0deg)';
+                        photo.style.zIndex = 10000;
+                    }
+                };
+            });
+
+            // Add a close hint
+            const hint = document.createElement('div');
+            hint.innerHTML = "Click anywhere to close the memories";
+            hint.style.position = 'absolute';
+            hint.style.bottom = '30px';
+            hint.style.width = '100%';
+            hint.style.textAlign = 'center';
+            hint.style.color = 'white';
+            hint.style.fontFamily = 'Outfit';
+            hint.style.opacity = '0.7';
+            splashArea.appendChild(hint);
+
+            splashArea.onclick = () => {
+                const results = splashArea.querySelectorAll('.splashed-photo');
+                results.forEach(p => {
+                    p.style.opacity = '0';
+                    p.style.transform = 'scale(0.1)';
+                });
+                splashArea.style.background = 'transparent';
+                setTimeout(() => {
+                    splashArea.innerHTML = '';
+                    splashArea.style.pointerEvents = 'none';
+                }, 600);
+            };
+        }
+
+        function createInitialSparkles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.innerHTML = ['✨', '💖', '🎉', '🌸'][Math.floor(Math.random() * 4)];
+                p.style.position = 'fixed';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.fontSize = Math.random() * 20 + 10 + 'px';
+                p.style.animation = `float ${Math.random() * 4 + 4}s linear infinite`;
+                p.style.opacity = '0.5';
+                container.appendChild(p);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHE SAID YES!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Outfit:wght@800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="fullscreen-container">
+        <video id="acceptVideo" autoplay playsinline>
+            <source src="website_1/video/accpting.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="ui-layer">
+        <!-- Floating hearts can be added here -->
+    </div>
+
+    <script>
+        const video = document.getElementById('acceptVideo');
+        video.onended = () => {
+            window.location.href = 'letter.html';
+        };
+    </script>
+</body>
+
+</html>

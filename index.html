@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Message For You</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Outfit:wght@400;800&display=swap"
+        rel="stylesheet">
+    <script src="js/config.js"></script>
+</head>
+
+<body>
+    <div id="startOverlay" class="start-overlay" onclick="startExperience()">
+        <!-- Aurora Background Blobs -->
+        <div class="aurora-blobs">
+            <div class="blob"></div>
+            <div class="blob"></div>
+            <div class="blob"></div>
+        </div>
+
+        <!-- Floating Glass Depth Elements -->
+        <div class="glass-elements">
+            <div class="glass-item heart-hollow"></div>
+            <div class="glass-item circle"></div>
+            <div class="glass-item heart-hollow"></div>
+        </div>
+
+        <div class="start-content">
+            <button class="start-heart-btn">❤️</button>
+            <div class="start-text">Tap to Open My Heart</div>
+        </div>
+    </div>
+
+    <!-- Background Sparkles Container -->
+    <div class="particles" id="particles"></div>
+
+    <div class="fullscreen-container">
+        <video id="proposalVideo" playsinline muted loop>
+            <source src="website_1/video/propsal.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="ui-layer">
+        <div id="buttonsOverlay" class="buttons-overlay"
+            style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+            <button id="yesBtn" class="cloud-btn yes">Yes, Forever</button>
+            <button id="noBtn" class="cloud-btn no">Maybe Later</button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const video = document.getElementById('proposalVideo');
+        const overlay = document.getElementById('buttonsOverlay');
+        const startOverlay = document.getElementById('startOverlay');
+
+        function startExperience() {
+            startOverlay.classList.add('hidden');
+            video.muted = false; // Unmute on interaction
+            video.play();
+            createSparkles();
+        }
+
+        video.onplay = () => {
+            setTimeout(() => {
+                overlay.classList.add('visible');
+            }, 3000); // Wait 3 seconds for drama
+        };
+
+        // UI Interactions
+        document.getElementById('yesBtn').onclick = () => window.location.href = 'accept.html';
+        document.getElementById('noBtn').onclick = () => window.location.href = 'reject.html';
+
+        // Background Sparkles Logic
+        function createSparkles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.innerHTML = '✨';
+                particle.style.position = 'absolute';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.fontSize = Math.random() * 20 + 10 + 'px';
+                particle.style.opacity = Math.random();
+                particle.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite alternate`;
+                container.appendChild(particle);
+            }
+        }
+
+        // Twinkle Animation via JS Injection
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes twinkle { from { opacity: 0.2; transform: scale(1); } to { opacity: 1; transform: scale(1.5); } }`;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

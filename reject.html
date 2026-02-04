@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Until Next Time...</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="fullscreen-container">
+        <video id="rejectVideo" autoplay playsinline>
+            <source src="website_1/video/rejecting.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        const video = document.getElementById('rejectVideo');
+        video.onended = () => {
+            window.location.href = 'thankyou.html';
+        };
+    </script>
+</body>
+
+</html>

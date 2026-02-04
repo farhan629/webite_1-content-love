@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Letter For You</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Outfit:wght@400;800&display=swap"
+        rel="stylesheet">
+    <script src="js/config.js"></script>
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff758c, #ff7eb3, #ff758c);
+            background-size: 400% 400%;
+            animation: gradientFlow 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Hybrid Glass + Parchment Container */
+        .glass-frame {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .scroll-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #fdf5e6;
+            /* Old Lace / Parchment color */
+            background-image: url('https://www.transparenttextures.com/patterns/papyros.png');
+            padding: 60px 40px;
+            border-radius: 35px;
+            box-shadow: inset 0 0 50px rgba(139, 69, 19, 0.1);
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 10px;
+        }
+
+        .letter-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 34px;
+            line-height: 1.8;
+            color: #3e2723;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .seal-decoration {
+            display: block;
+            text-align: right;
+            font-size: 50px;
+            margin-top: 40px;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+        }
+
+        .action-btns {
+            padding: 20px 0 10px 0;
+            text-align: center;
+        }
+
+        /* Question Overlay */
+        #proposalModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #proposalModal.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(25px);
+            padding: 30px;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            color: white;
+        }
+
+        .modal-card h2 {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(32px, 8vw, 50px);
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .scroll-container {
+                padding: 40px 20px;
+            }
+
+            .letter-text {
+                font-size: 26px;
+            }
+
+            .modal-card {
+                padding: 40px 20px;
+            }
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            min-height: 100px;
+            align-items: center;
+        }
+
+        .modal-btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: 800;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: 0.3s;
+        }
+
+        .modal-btn.yes {
+            background: white;
+            color: #ff758c;
+        }
+
+        .modal-btn.no {
+            background: transparent;
+            color: white;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="proposalModal">
+        <div class="modal-card">
+            <h2 id="finalQuestionTxt">Will you be my rest of the half?</h2>
+            <div class="modal-actions" id="modalActions">
+                <button class="modal-btn yes" id="finalYesBtn" onclick="window.location.href='photo.html'">Yes!</button>
+                <button class="modal-btn no" id="finalNoBtn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop></audio>
+
+    <div class="glass-frame">
+        <div class="scroll-container">
+            <div id="letterContent" class="letter-text">
+                Loading your special message...
+            </div>
+            <div class="seal-decoration">❤️</div>
+        </div>
+        <div class="action-btns">
+            <button class="save-btn" onclick="showProposal()">Close & Open My Heart</button>
+        </div>
+    </div>
+
+    <script>
+        let evasiveMode = false;
+
+        window.onload = () => {
+            const configData = window.CONFIG || {};
+            const localData = JSON.parse(localStorage.getItem('romanticSiteData')) || {};
+            const data = { ...localData, ...configData };
+
+            if (data) {
+                document.getElementById('letterContent').innerText = data.letter || "My Dearest...";
+                document.getElementById('finalQuestionTxt').innerText = data.finalQuestion || "Will you be my rest of the half?";
+                document.getElementById('finalYesBtn').innerText = data.finalYesText || "Yes!";
+                document.getElementById('finalNoBtn').innerText = data.finalNoText || "No";
+
+                // Background Music Logic
+                if (data.music) {
+                    const audio = document.getElementById('bgMusic');
+                    audio.src = data.music;
+                    audio.volume = 0;
+
+                    const playAudio = () => {
+                        audio.play().then(() => {
+                            let fadeIn = setInterval(() => {
+                                if (audio.volume < 0.5) {
+                                    audio.volume += 0.05;
+                                } else {
+                                    clearInterval(fadeIn);
+                                }
+                            }, 200);
+                        }).catch(err => console.log("Waiting for user interaction..."));
+                    };
+
+                    // Try autoplay
+                    playAudio();
+
+                    // Fallback for autoplay block - play on first click/touch
+                    document.addEventListener('click', playAudio, { once: true });
+                    document.addEventListener('touchstart', playAudio, { once: true });
+                }
+            }
+        };
+
+        function showProposal() {
+            document.getElementById('proposalModal').classList.add('active');
+            startEvasiveMode();
+        }
+
+        function startEvasiveMode() {
+            evasiveMode = true;
+            setTimeout(() => {
+                evasiveMode = false;
+                const noBtn = document.getElementById('finalNoBtn');
+                noBtn.style.opacity = '0.3';
+                noBtn.style.pointerEvents = 'none';
+            }, 10000);
+        }
+
+        const noBtn = document.getElementById('finalNoBtn');
+        document.addEventListener('mousemove', (e) => {
+            if (!evasiveMode) return;
+            const rect = noBtn.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const btnX = rect.left + rect.width / 2;
+            const btnY = rect.top + rect.height / 2;
+            const dist = Math.hypot(mouseX - btnX, mouseY - btnY);
+
+            if (dist < 150) {
+                const newX = Math.random() * (window.innerWidth - rect.width);
+                const newY = Math.random() * (window.innerHeight - rect.height);
+                noBtn.style.left = newX + 'px';
+                noBtn.style.top = newY + 'px';
+                noBtn.style.position = 'fixed';
+            }
+        });
+    </script>
+</body>
+
+</html>
