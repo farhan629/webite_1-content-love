@@ -246,32 +246,41 @@
 
         function startEvasiveMode() {
             evasiveMode = true;
-            setTimeout(() => {
-                evasiveMode = false;
-                const noBtn = document.getElementById('finalNoBtn');
-                noBtn.style.opacity = '0.3';
-                noBtn.style.pointerEvents = 'none';
-            }, 10000);
+            const noBtn = document.getElementById('finalNoBtn');
+            noBtn.style.transition = 'none'; // Fast jump
         }
 
         const noBtn = document.getElementById('finalNoBtn');
-        document.addEventListener('mousemove', (e) => {
+
+        const moveButton = (e) => {
             if (!evasiveMode) return;
+
             const rect = noBtn.getBoundingClientRect();
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
+            // Support both mouse and touch
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            if (!clientX || !clientY) return;
+
             const btnX = rect.left + rect.width / 2;
             const btnY = rect.top + rect.height / 2;
-            const dist = Math.hypot(mouseX - btnX, mouseY - btnY);
+            const dist = Math.hypot(clientX - btnX, clientY - btnY);
 
+            // If mouse is within 150px, jump!
             if (dist < 150) {
-                const newX = Math.random() * (window.innerWidth - rect.width);
-                const newY = Math.random() * (window.innerHeight - rect.height);
+                const margin = 50;
+                const newX = Math.random() * (window.innerWidth - rect.width - margin * 2) + margin;
+                const newY = Math.random() * (window.innerHeight - rect.height - margin * 2) + margin;
+
+                noBtn.style.position = 'fixed';
                 noBtn.style.left = newX + 'px';
                 noBtn.style.top = newY + 'px';
-                noBtn.style.position = 'fixed';
+                noBtn.style.zIndex = '4000';
             }
-        });
+        };
+
+        document.addEventListener('mousemove', moveButton);
+        document.addEventListener('touchstart', moveButton, { passive: false });
     </script>
 </body>
 
