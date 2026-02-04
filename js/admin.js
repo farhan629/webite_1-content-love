@@ -269,7 +269,8 @@ function saveData() {
         alert("🚨 Storage Limit Exceeded! \n\nPlease remove some photos or use a smaller music file. Browsers only allow 5MB of local data.");
     }
 }
-function generateGitHubConfig() {
+
+async function generateGitHubConfig() {
     const data = {
         yesText: document.getElementById('yesText').value,
         noText: document.getElementById('noText').value,
@@ -283,13 +284,38 @@ function generateGitHubConfig() {
         music: backgroundMusic
     };
 
+    const status = document.getElementById('status');
+    status.innerText = "⏳ Syncing to GitHub/Config...";
+    status.style.color = "#ffa500";
+
+    // Show the output area immediately so they see it
     const configCode = `window.CONFIG = ${JSON.stringify(data, null, 4)};`;
-    const area = document.getElementById('configExportArea');
-    const output = document.getElementById('configOutput');
-    
-    area.style.display = 'block';
-    output.value = configCode;
-    area.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('configExportArea').style.display = 'block';
+    document.getElementById('configOutput').value = configCode;
+
+    try {
+        const response = await fetch('/sync', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            status.innerText = "✨ Successfully synced to GitHub!";
+            status.style.color = "#4CAF50";
+            alert("✅ SUCCESS! Changes updated locally and pushed to GitHub.\n\nYour website will update in about 1 minute. Refresh your phone then!");
+        } else {
+            throw new Error("Server error");
+        }
+    } catch (e) {
+        status.innerText = "❌ Sync Failed! (Use Manual Copy Below)";
+        status.style.color = "#ff4d4d";
+        
+        const errorMsg = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname.startsWith("192.168")
+            ? "⚠️ AUTO-SYNC FAILED!\n\nYou must run 'node server.js' instead of 'npx serve' for the auto-push to work.\n\nNow: Please COPY the code below and PASTE it into js/config.js on GitHub manually!"
+            : "⚠️ AUTO-SYNC FAILED!\n\nAuto-Sync only works from your computer. Since you are on the hosted web link, please COPY the code below and PASTE it into js/config.js on GitHub repository manually!";
+        
+        alert(errorMsg);
+    }
 }
 
 function copyConfigToClipboard() {
